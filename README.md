@@ -1,4 +1,4 @@
-## About QR-CODE Generator
+## About Volunteer Locator app
 
 A web application that allows users to find volunteer locations around them.
 
