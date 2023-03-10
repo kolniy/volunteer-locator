@@ -10,22 +10,22 @@ import {
   Label,
   Button,
 } from "reactstrap";
+import VolunteerMarker from "./VolunteerMarker";
 import getAddressGiocode from "../utilities/getAddressGiocode";
+import getVolunteerLocations from "../utilities/getVolunteerLocations";
 
 const AppContainer = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [volunteerLocations, setVolunteerLocations] = useState([]);
   const [myAddress, setMyAddress] = useState(null);
   const mapRef = useRef();
   const center = useMemo(() => ({ lat: 9.076479, lng: 7.398574 }), []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const options = useMemo(
-    () => (
-      {
-        disableDefaultUI: true,
-        clickableIcons: false,
-      },
-      []
-    )
+    () => ({
+      disableDefaultUI: true,
+      clickableIcons: false,
+    }),
+    []
   );
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -42,6 +42,8 @@ const AppContainer = () => {
     e.preventDefault();
     const { lat, lng } = await getAddressGiocode(searchQuery);
     updatePosition({ lat, lng });
+    const foundVolunteerLocations = await getVolunteerLocations({ lat, lng });
+    setVolunteerLocations(foundVolunteerLocations);
   };
 
   return (
@@ -51,7 +53,7 @@ const AppContainer = () => {
           <Row>
             <Col xs="12" sm="3" md="3" lg="3">
               <div className="controls-container">
-                <Form onClick={handleFormSubmitHandler}>
+                <Form onSubmit={(e) => handleFormSubmitHandler(e)}>
                   <FormGroup className="form-group-style">
                     <Label>Input Address</Label>
                     <Input
@@ -80,7 +82,21 @@ const AppContainer = () => {
                   >
                     {myAddress && (
                       <>
-                        <Marker position={myAddress} />
+                        <Marker
+                          position={myAddress}
+                          icon="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
+                          title="Your Address."
+                        />
+                      </>
+                    )}
+                    {volunteerLocations.length > 0 && (
+                      <>
+                        {volunteerLocations.map((location) => (
+                          <VolunteerMarker
+                            key={location.place_id}
+                            foundLocation={location}
+                          />
+                        ))}
                       </>
                     )}
                   </GoogleMap>
