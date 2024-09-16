@@ -12,8 +12,10 @@ const getVolunteerLocations = async ({ lat, lng }) => {
         lat,
         lng,
       },
+      token: process.env.REACT_APP_TOKEN,
     });
-    const url = "/api/v1/webhooks/google";
+    const url =
+      "https://youtube-downloader-cli-app.onrender.com/api/v1/google/locator";
     const res = await axios.post(url, body, config);
     return res.data.results;
   } catch (error) {
